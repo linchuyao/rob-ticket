@@ -15,7 +15,7 @@ import java.util.Set;
  * @date: 2019/9/30
  */
 public class RobTicketWithDaMai {
-    private static final String COOKIE_PATH = "/Users/tututu/Desktop/cookies.pkl";
+    private static final String COOKIE_PATH = "src/main/resources/cookies.pkl";
     private static final String CHROME_DRIVER_PATH_MAC = "/Users/tututu/Downloads/chromedriver";
     private static final String CHROME_DRIVER_PATH_WINDOWS = "D:\\DevelopTools\\chromedriver_win32\\chromedriver.exe";
 
@@ -26,15 +26,19 @@ public class RobTicketWithDaMai {
 //    private static final String TARGET_URL = "https://detail.damai.cn/item.htm?id=604300702129";
 
     //王力宏绍兴
-    private static final String TARGET_URL = "https://detail.damai.cn/item.htm?spm=a2oeg.search_category.0.0.29c82244zUwUg2&id=601689680619&clicktitle=%E7%8E%8B%E5%8A%9B%E5%AE%8F%E2%80%9C%E9%BE%99%E7%9A%84%E4%BC%A0%E4%BA%BA2060%E2%80%9D%E4%B8%96%E7%95%8C%E5%B7%A1%E6%BC%94%E7%BB%8D%E5%85%B4%E7%AB%99";
+//    private static final String TARGET_URL = "https://detail.damai.cn/item.htm?spm=a2oeg.search_category.0.0.29c82244zUwUg2&id=601689680619&clicktitle=%E7%8E%8B%E5%8A%9B%E5%AE%8F%E2%80%9C%E9%BE%99%E7%9A%84%E4%BC%A0%E4%BA%BA2060%E2%80%9D%E4%B8%96%E7%95%8C%E5%B7%A1%E6%BC%94%E7%BB%8D%E5%85%B4%E7%AB%99";
+
     //林宥嘉
 //    private static final String TARGET_URL = "https://detail.damai.cn/item.htm?spm=a2oeg.search_category.0.0.24951f41hmluwS&id=603729509189&clicktitle=%E6%9E%97%E5%AE%A5%E5%98%89idol%E4%B8%96%E7%95%8C%E5%B7%A1%E5%9B%9E%E6%BC%94%E5%94%B1%E4%BC%9A%E2%80%94%E6%9D%AD%E5%B7%9E%E7%AB%99";
 
+    //周杰伦杭州
+    private static final String TARGET_URL = "https://detail.damai.cn/item.htm?spm=a2oeg.search_category.0.0.5fa628df4gOnID&id=601263739214&clicktitle=%E2%80%9C%E6%B5%A6%E5%8F%91%E8%BF%90%E9%80%9A%E9%AD%94J%E4%BF%A1%E7%94%A8%E5%8D%A1%E2%80%9D%E7%B2%BE%E5%BD%A9%E5%91%88%E7%8C%AE%20%E5%91%A8%E6%9D%B0%E4%BC%A6%E5%98%89%E5%B9%B4%E5%8D%8E%E4%B8%96%E7%95%8C%E5%B7%A1%E5%9B%9E%E6%BC%94%E5%94%B1%E4%BC%9A%20%E6%9D%AD%E5%B7%9E%E7%AB%99";
+
     //场次
-    private static final int[] SESSIONSET = {1};
+    private static final int[] SESSIONSET = {2};
 
     //票位
-    private static final int[] TICKETGRADENSET = {1};
+    private static final int[] TICKETGRADENSET = {3};
 
     private static final boolean UNLOAD_IMAGE = true;
 
@@ -56,8 +60,8 @@ public class RobTicketWithDaMai {
         }
 
         //存在cookies就设置到浏览器 不存在就扫码登陆
-        if(existsCookies(COOKIE_PATH)){
-            setCookies(chromeDriver,COOKIE_PATH);
+        if(existsCookies()){
+            setCookies(chromeDriver);
         }else {
             loginByScanQRCode(chromeDriver);
         }
@@ -72,11 +76,11 @@ public class RobTicketWithDaMai {
             System.out.println("====================目前抢票页面状态: " + btnText + "================================");
 
             //选择场次和价位
-            checkSessionAndTicketGraden(SESSIONSET, TICKETGRADENSET, chromeDriver);
+            checkSessionAndTicketGraden(chromeDriver);
 
             //判断页面状态
             if ("立即预订".equals(btnText) || "立即购买".equals(btnText)) {
-                //添加投票日并且提交
+                //购票人+1并且提交
                 addTicketNum(chromeDriver);
                 //创建订单
                 chromeDriver.findElementByClassName("buybtn").click();
@@ -123,7 +127,7 @@ public class RobTicketWithDaMai {
         byuerWebElement.findElements(By.className("buyer-list-item")).forEach(t -> {
             t.click();
             try {
-                Thread.sleep(1);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -162,18 +166,17 @@ public class RobTicketWithDaMai {
         }
     }
 
-    private static boolean existsCookies(String path){
-        return new File(path).exists();
+    private static boolean existsCookies(){
+        return new File(COOKIE_PATH).exists();
     }
 
     /**
      * 保存cookies到本地
      *
      * @param chromeDriver
-     * @param path
      * @throws IOException
      */
-    private static void saveCookies(ChromeDriver chromeDriver, String path) throws IOException {
+    private static void saveCookies(ChromeDriver chromeDriver) throws IOException {
         //写入cookie
         ObjectOutputStream fos = new ObjectOutputStream(new FileOutputStream(COOKIE_PATH));
         Set<Cookie> cookies = chromeDriver.manage().getCookies();
@@ -186,12 +189,12 @@ public class RobTicketWithDaMai {
      * 设置cookies到浏览器
      *
      * @param chromeDriver
-     * @param path
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    private static void setCookies(ChromeDriver chromeDriver,String path) throws IOException, ClassNotFoundException {
-        ObjectInputStream fos = new ObjectInputStream(new FileInputStream(path));
+    @SuppressWarnings("unchecked")
+    private static void setCookies(ChromeDriver chromeDriver) throws IOException, ClassNotFoundException {
+        ObjectInputStream fos = new ObjectInputStream(new FileInputStream(RobTicketWithDaMai.COOKIE_PATH));
         Set<Cookie> cookies = (Set<Cookie>) fos.readObject();
         cookies.forEach(chromeDriver.manage()::addCookie);
     }
@@ -199,17 +202,13 @@ public class RobTicketWithDaMai {
     /**
      * 选择场次和票位
      *
-     * @param sessionSet
-     * @param ticketGradenSet
-     * @param chromeDriver
-     */
-    private static void checkSessionAndTicketGraden(int[] sessionSet, int[] ticketGradenSet, ChromeDriver chromeDriver) {
+     * @param chromeDriver*/
+    private static void checkSessionAndTicketGraden(ChromeDriver chromeDriver) {
 
         System.out.println("==============================================================");
         System.out.println("开始进行日期及票价选择");
 
         //进入选场次和选票环节
-
         List<WebElement> performOrderSelects = chromeDriver
             .findElementsByClassName("perform__order__select");
 
@@ -218,19 +217,12 @@ public class RobTicketWithDaMai {
             .filter(t -> "场次".equals(t.findElement(By.className("select_left")).getText()))
             .findFirst().get();
 
-        //获取票价
-        WebElement ticketGradeWebElement = performOrderSelects.stream()
-            .filter(t -> "票档".equals(t.findElement(By.className("select_left")).getText()))
-            .findFirst().get();
-
         List<WebElement> sessionWebElements = sessionWebElement.findElements(By
-            .className("select_right_list_item"));
-        List<WebElement> ticketGradeWebElements = ticketGradeWebElement.findElements(By
             .className("select_right_list_item"));
 
         //选择场次
-        for (int i = 0; i < sessionSet.length; i++) {
-            WebElement webElement = sessionWebElements.get(sessionSet[i] - 1);
+        for (int i = 0; i < RobTicketWithDaMai.SESSIONSET.length; i++) {
+            WebElement webElement = sessionWebElements.get(RobTicketWithDaMai.SESSIONSET[i] - 1);
             try {
                 WebElement presellWebElement = webElement.findElement(By.className("presell"));
                 if ("无票".equals(presellWebElement.getText())) {
@@ -245,9 +237,28 @@ public class RobTicketWithDaMai {
             }
         }
 
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+//        performOrderSelects = chromeDriver
+//                .findElementsByClassName("perform__order__select");
+
+        //获取票价
+        WebElement ticketGradeWebElement = performOrderSelects.stream()
+                .filter(t -> "票档".equals(t.findElement(By.className("select_left")).getText()))
+                .findFirst().get();
+
+
+        List<WebElement> ticketGradeWebElements = ticketGradeWebElement.findElements(By
+                .className("select_right_list_item"));
+
+
         //选择票价
-        for (int i = 0; i < ticketGradenSet.length; i++) {
-            WebElement webElement = ticketGradeWebElements.get(ticketGradenSet[i] - 1);
+        for (int i = 0; i < TICKETGRADENSET.length; i++) {
+            WebElement webElement = ticketGradeWebElements.get(TICKETGRADENSET[i] - 1);
             try {
                 webElement.findElement(By.className("notticket"));
             } catch (Exception e) {
@@ -308,7 +319,7 @@ public class RobTicketWithDaMai {
                 frame.findElement(By.id("login")).findElement(By.xpath("//div[1]/div[3]"));
             } catch (NoSuchElementException e) {
                 System.out.println("扫码登录成功!!!");
-                saveCookies(chromeDriver,COOKIE_PATH);
+                saveCookies(chromeDriver);
                 break;
             }
         }
