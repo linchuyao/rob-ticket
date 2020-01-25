@@ -22,10 +22,10 @@ public class RobTicketWithDaMai {
     private static final String COOKIE_PATH = "src/main/resources/cookies.pkl";
 
     //chromDriver驱动地址-mac系统
-    private static final String CHROME_DRIVER_PATH_MAC = "/Users/tututu/Downloads/chromedriver";
+    private static final String CHROME_DRIVER_PATH_MAC = "";
 
     //chromDriver驱动地址-windows系统
-    private static final String CHROME_DRIVER_PATH_WINDOWS = "D:\\DevelopTools\\chromedriver_win32\\chromedriver.exe";
+    private static final String CHROME_DRIVER_PATH_WINDOWS = "";
 
     //大麦首页
     private static final String DOMAIN_URL = "https://www.damai.cn";
